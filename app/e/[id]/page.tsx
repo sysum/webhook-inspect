@@ -1,7 +1,8 @@
 export const dynamic = 'force-dynamic'
 
 import { createClient } from '@/lib/supabase-server'
-import { redirect, notFound } from 'next/navigation'
+import { requireUser } from '@/lib/auth'
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import CopyButton from '@/components/CopyButton'
 import RequestList from '@/components/RequestList'
@@ -12,13 +13,8 @@ export default async function EndpointPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
+  const { user } = await requireUser()
   const supabase = await createClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) redirect('/login')
 
   // Verify ownership
   const { data: endpoint } = await supabase

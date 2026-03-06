@@ -35,6 +35,7 @@ export async function proxy(request: NextRequest) {
   // Public paths that don't require auth
   const isPublic =
     pathname === '/login' ||
+    pathname === '/blocked' ||
     pathname.startsWith('/auth/') ||
     pathname.startsWith('/api/w/')
 

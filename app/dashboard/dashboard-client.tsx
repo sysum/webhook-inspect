@@ -13,9 +13,11 @@ type Endpoint = {
 export default function DashboardClient({
   initialEndpoints,
   userEmail,
+  isAdmin,
 }: {
   initialEndpoints: Endpoint[]
   userEmail: string
+  isAdmin: boolean
 }) {
   const [endpoints, setEndpoints] = useState<Endpoint[]>(initialEndpoints)
   const [creating, setCreating] = useState(false)
@@ -62,6 +64,14 @@ export default function DashboardClient({
         <span className="text-green-400 font-bold tracking-tight">webhook.inspect</span>
         <div className="flex items-center gap-4">
           <span className="text-gray-500 text-xs">{userEmail}</span>
+          {isAdmin && (
+            <button
+              onClick={() => router.push('/admin')}
+              className="text-purple-400 hover:text-purple-300 text-xs transition-colors border border-purple-800 hover:border-purple-600 px-2 py-0.5 rounded"
+            >
+              admin
+            </button>
+          )}
           <button
             onClick={signOut}
             className="text-gray-500 hover:text-gray-300 text-xs transition-colors"

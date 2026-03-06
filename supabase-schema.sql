@@ -50,3 +50,24 @@ create policy "users_read_own_requests"
 -- Enable Realtime for the requests table
 -- Run this to add the table to the realtime publication:
 alter publication supabase_realtime add table requests;
+
+-- -------------------------------------------------------
+-- 3. Profiles table (role + blocked status per user)
+-- -------------------------------------------------------
+create table if not exists profiles (
+  id         uuid primary key references auth.users(id) on delete cascade,
+  email      text not null,
+  role       text not null default 'user' check (role in ('admin', 'user')),
+  blocked    boolean not null default false,
+  created_at timestamptz default now() not null
+);
+
+alter table profiles enable row level security;
+
+-- Users can read their own profile (needed for blocked/role check in server components)
+create policy "users_read_own_profile"
+  on profiles for select
+  using (auth.uid() = id);
+
+-- Note: all profile writes (insert, update) are done via the service role key
+-- in API routes, which bypasses RLS. No additional policies are needed for writes.
