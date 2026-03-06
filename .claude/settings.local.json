@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --yes)",
+      "Bash(npx create-next-app@latest /tmp/webhook-tool --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --yes)",
+      "Bash(npm install @supabase/ssr @supabase/supabase-js)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(npm install typescript --save-dev)",
+      "Bash(node node_modules/typescript/bin/tsc --noEmit)",
+      "Bash(npm run build)"
+    ]
+  }
+}
