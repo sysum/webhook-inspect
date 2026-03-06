@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase-browser'
 import EndpointNameEditor from '@/components/EndpointNameEditor'
 
@@ -261,16 +262,13 @@ export default function DashboardClient({
         ) : (
           <div className="space-y-2">
             {filtered.map((ep) => (
-              <div
+              <Link
                 key={ep.id}
-                onClick={() => router.push(`/e/${ep.id}`)}
+                href={`/e/${ep.id}`}
                 className="group cursor-pointer bg-gray-800 border border-gray-600 hover:border-gray-500 hover:bg-gray-750 rounded-lg px-4 py-3 flex items-center gap-3 transition-colors"
               >
-                {/* Name + path + creator — stop propagation so rename/copy don't navigate */}
-                <div
-                  className="flex-1 min-w-0"
-                  onClick={(e) => e.stopPropagation()}
-                >
+                {/* Name + path + creator */}
+                <div className="flex-1 min-w-0">
                   <EndpointNameEditor
                     id={ep.id}
                     initialName={ep.name}
@@ -351,7 +349,7 @@ export default function DashboardClient({
                     delete
                   </button>
                 )}
-              </div>
+              </Link>
             ))}
           </div>
         )}

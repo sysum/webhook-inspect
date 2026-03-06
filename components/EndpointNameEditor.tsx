@@ -54,6 +54,8 @@ export default function EndpointNameEditor({
           if (e.key === 'Escape') cancelEdit()
         }}
         onBlur={commitEdit}
+        // Prevent clicks inside the input from bubbling to any parent <Link>
+        onClick={(e) => e.stopPropagation()}
         placeholder="endpoint label"
         className={`bg-gray-950 border border-green-700 rounded px-2 py-0.5 text-sm text-gray-100 placeholder-gray-600 focus:outline-none ${block ? 'w-full' : 'min-w-[180px]'}`}
       />
@@ -66,7 +68,7 @@ export default function EndpointNameEditor({
         {name ?? <span className="text-gray-500 italic font-normal">unnamed</span>}
       </span>
       <button
-        onClick={startEdit}
+        onClick={(e) => { e.stopPropagation(); e.preventDefault(); startEdit() }}
         title="Rename"
         className="shrink-0 opacity-0 group-hover/rename:opacity-100 text-gray-500 hover:text-gray-200 transition-opacity"
       >
