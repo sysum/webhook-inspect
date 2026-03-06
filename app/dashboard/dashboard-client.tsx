@@ -263,10 +263,14 @@ export default function DashboardClient({
             {filtered.map((ep) => (
               <div
                 key={ep.id}
-                className="group bg-gray-800 border border-gray-600 hover:border-gray-500 rounded-lg px-4 py-3 flex items-center gap-3 transition-colors"
+                onClick={() => router.push(`/e/${ep.id}`)}
+                className="group cursor-pointer bg-gray-800 border border-gray-600 hover:border-gray-500 hover:bg-gray-750 rounded-lg px-4 py-3 flex items-center gap-3 transition-colors"
               >
-                {/* Name + path + creator */}
-                <div className="flex-1 min-w-0">
+                {/* Name + path + creator — stop propagation so rename/copy don't navigate */}
+                <div
+                  className="flex-1 min-w-0"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <EndpointNameEditor
                     id={ep.id}
                     initialName={ep.name}
@@ -274,10 +278,7 @@ export default function DashboardClient({
                     className="text-sm text-gray-100"
                   />
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    <div
-                      className="text-xs text-gray-400 font-mono truncate cursor-pointer hover:text-gray-200 transition-colors"
-                      onClick={() => router.push(`/e/${ep.id}`)}
-                    >
+                    <div className="text-xs text-gray-400 font-mono truncate">
                       /api/w/{ep.id}
                     </div>
                     <CopyUrlButton url={`${appUrl}/api/w/${ep.id}`} />
@@ -304,19 +305,14 @@ export default function DashboardClient({
                   {new Date(ep.created_at).toLocaleDateString()}
                 </div>
 
-                {/* Inspect button */}
-                <button
-                  onClick={() => router.push(`/e/${ep.id}`)}
-                  className="text-green-400 hover:text-green-300 text-xs opacity-0 group-hover:opacity-100 transition-all shrink-0"
-                >
-                  inspect →
-                </button>
-
-                {/* Delete — with inline confirm */}
+                {/* Delete — with inline confirm; always stop propagation */}
                 {deletingId === ep.id ? (
                   <span className="text-gray-400 text-xs shrink-0">deleting…</span>
                 ) : confirmDeleteId === ep.id ? (
-                  <div className="flex items-center gap-1.5 shrink-0">
+                  <div
+                    className="flex items-center gap-1.5 shrink-0"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <span className="text-xs text-gray-300">sure?</span>
                     <button
                       onClick={() => deleteEndpoint(ep.id)}
@@ -333,9 +329,25 @@ export default function DashboardClient({
                   </div>
                 ) : (
                   <button
-                    onClick={() => setConfirmDeleteId(ep.id)}
-                    className="text-red-400 hover:text-red-300 text-xs opacity-0 group-hover:opacity-100 transition-all shrink-0"
+                    onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(ep.id) }}
+                    className="flex items-center gap-1 text-red-400 hover:text-red-300 text-xs opacity-0 group-hover:opacity-100 transition-all shrink-0"
                   >
+                    <svg
+                      width="11"
+                      height="11"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                      <path d="M10 11v6" />
+                      <path d="M14 11v6" />
+                      <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                    </svg>
                     delete
                   </button>
                 )}
