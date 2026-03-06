@@ -67,26 +67,26 @@ export default function RequestList({
   return (
     <div className="flex flex-1 min-h-0">
       {/* Left pane — request list */}
-      <div className="w-72 shrink-0 flex flex-col border-r border-gray-800 min-h-0">
+      <div className="w-72 shrink-0 flex flex-col border-r border-gray-600 min-h-0">
         {/* Status bar */}
-        <div className="px-3 py-2 border-b border-gray-800 flex items-center justify-between">
-          <span className="text-xs text-gray-600">
+        <div className="px-3 py-2 border-b border-gray-600 flex items-center justify-between bg-gray-800">
+          <span className="text-xs text-gray-300">
             {requests.length} request{requests.length !== 1 ? 's' : ''}
           </span>
           <div className="flex items-center gap-1.5">
             <div
-              className={`w-1.5 h-1.5 rounded-full ${connected ? 'bg-green-500 animate-pulse' : 'bg-gray-600'}`}
+              className={`w-1.5 h-1.5 rounded-full ${connected ? 'bg-green-400 animate-pulse' : 'bg-gray-500'}`}
             />
-            <span className="text-[10px] text-gray-600">
+            <span className="text-[10px] text-gray-400">
               {connected ? 'live' : 'connecting...'}
             </span>
           </div>
         </div>
 
         {/* List */}
-        <div ref={listRef} className="flex-1 overflow-y-auto">
+        <div ref={listRef} className="flex-1 overflow-y-auto bg-gray-850">
           {requests.length === 0 ? (
-            <div className="p-4 text-center text-gray-700 text-xs mt-8">
+            <div className="p-4 text-center text-gray-400 text-xs mt-8">
               waiting for requests...
             </div>
           ) : (
@@ -94,22 +94,22 @@ export default function RequestList({
               <button
                 key={req.id}
                 onClick={() => setSelected(req)}
-                className={`w-full text-left px-3 py-2.5 border-b border-gray-900 transition-colors ${
+                className={`w-full text-left px-3 py-2.5 border-b border-gray-700 transition-colors ${
                   selected?.id === req.id
-                    ? 'bg-gray-800'
-                    : 'hover:bg-gray-900'
+                    ? 'bg-gray-700'
+                    : 'hover:bg-gray-700/60'
                 }`}
               >
                 <div className="flex items-center gap-2 mb-1">
                   <MethodBadge method={req.method} />
-                  <span className="text-gray-300 text-xs font-mono truncate">
+                  <span className="text-gray-200 text-xs font-mono truncate">
                     {req.path}
                   </span>
                 </div>
-                <div className="text-[10px] text-gray-600 font-mono">
+                <div className="text-[10px] text-gray-400 font-mono">
                   {formatTime(req.created_at)}
                   {req.ip && (
-                    <span className="ml-2 text-gray-700">{req.ip}</span>
+                    <span className="ml-2 text-gray-500">{req.ip}</span>
                   )}
                 </div>
               </button>
@@ -119,7 +119,7 @@ export default function RequestList({
       </div>
 
       {/* Right pane — detail */}
-      <div className="flex-1 flex flex-col min-h-0 bg-gray-950">
+      <div className="flex-1 flex flex-col min-h-0 bg-gray-800">
         <RequestDetail request={selected} />
       </div>
     </div>

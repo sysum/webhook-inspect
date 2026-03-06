@@ -14,7 +14,7 @@ type Endpoint = {
 
 type SortKey = 'date' | 'name' | 'requests'
 
-/** Minimal inline clipboard button shown next to the /api/w/{id} path */
+/** Minimal clipboard icon next to the /api/w/{id} path */
 function CopyUrlButton({ url }: { url: string }) {
   const [copied, setCopied] = useState(false)
 
@@ -29,7 +29,7 @@ function CopyUrlButton({ url }: { url: string }) {
     <button
       onClick={copy}
       title="Copy webhook URL"
-      className="shrink-0 text-gray-500 hover:text-green-400 transition-colors"
+      className="shrink-0 text-gray-400 hover:text-green-400 transition-colors"
     >
       {copied ? (
         <span className="text-green-400 text-xs">✓</span>
@@ -68,12 +68,23 @@ export default function DashboardClient({
   const [newName, setNewName] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [sortKey, setSortKey] = useState<SortKey>('date')
+  const [sortDir, setSortDir] = useState<'desc' | 'asc'>('desc')
   const router = useRouter()
   const supabase = createClient()
 
-  /** Filtered + sorted view of endpoints */
+  /** Clicking the active key toggles direction; clicking a new key resets to desc */
+  function handleSort(key: SortKey) {
+    if (key === sortKey) {
+      setSortDir((d) => (d === 'desc' ? 'asc' : 'desc'))
+    } else {
+      setSortKey(key)
+      setSortDir('desc')
+    }
+  }
+
   const filtered = useMemo(() => {
     let list = [...endpoints]
 
@@ -87,18 +98,25 @@ export default function DashboardClient({
     }
 
     if (sortKey === 'date') {
-      list.sort(
-        (a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-      )
+      list.sort((a, b) => {
+        const diff =
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        return sortDir === 'desc' ? diff : -diff
+      })
     } else if (sortKey === 'name') {
-      list.sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
+      list.sort((a, b) => {
+        const cmp = (a.name ?? '').localeCompare(b.name ?? '')
+        return sortDir === 'asc' ? cmp : -cmp
+      })
     } else if (sortKey === 'requests') {
-      list.sort((a, b) => b.requestCount - a.requestCount)
+      list.sort((a, b) => {
+        const diff = b.requestCount - a.requestCount
+        return sortDir === 'desc' ? diff : -diff
+      })
     }
 
     return list
-  }, [endpoints, search, sortKey])
+  }, [endpoints, search, sortKey, sortDir])
 
   async function createEndpoint() {
     setCreating(true)
@@ -118,6 +136,7 @@ export default function DashboardClient({
   }
 
   async function deleteEndpoint(id: string) {
+    setConfirmDeleteId(null)
     setDeletingId(id)
     await fetch(`/api/endpoints/${id}`, { method: 'DELETE' })
     setEndpoints((prev) => prev.filter((e) => e.id !== id))
@@ -136,18 +155,18 @@ export default function DashboardClient({
       <header className="border-b border-gray-700 px-6 py-3 flex items-center justify-between shrink-0">
         <span className="text-green-400 font-bold tracking-tight">webhook.inspect</span>
         <div className="flex items-center gap-4">
-          <span className="text-gray-400 text-xs">{userEmail}</span>
+          <span className="text-gray-300 text-xs">{userEmail}</span>
           {isAdmin && (
             <button
               onClick={() => router.push('/admin')}
-              className="text-purple-400 hover:text-purple-300 text-xs transition-colors border border-purple-700 hover:border-purple-500 px-2 py-0.5 rounded"
+              className="text-purple-400 hover:text-purple-300 text-xs transition-colors border border-purple-600 hover:border-purple-400 px-2 py-0.5 rounded"
             >
               admin
             </button>
           )}
           <button
             onClick={signOut}
-            className="text-gray-400 hover:text-gray-200 text-xs transition-colors"
+            className="text-gray-300 hover:text-gray-100 text-xs transition-colors"
           >
             sign out
           </button>
@@ -159,7 +178,7 @@ export default function DashboardClient({
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-lg font-semibold text-gray-100">endpoints</h1>
-            <p className="text-gray-400 text-xs mt-0.5">
+            <p className="text-gray-300 text-xs mt-0.5">
               {endpoints.length} endpoint{endpoints.length !== 1 ? 's' : ''}
             </p>
           </div>
@@ -181,7 +200,7 @@ export default function DashboardClient({
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && createEndpoint()}
               placeholder="endpoint label (optional)"
-              className="flex-1 bg-gray-900 border border-gray-600 rounded px-3 py-1.5 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-green-500 transition-colors"
+              className="flex-1 bg-gray-700 border border-gray-500 rounded px-3 py-1.5 text-sm text-gray-100 placeholder-gray-400 focus:outline-none focus:border-green-500 transition-colors"
             />
             <button
               onClick={createEndpoint}
@@ -192,14 +211,14 @@ export default function DashboardClient({
             </button>
             <button
               onClick={() => setShowForm(false)}
-              className="text-gray-400 hover:text-gray-200 text-xs px-2 transition-colors"
+              className="text-gray-300 hover:text-gray-100 text-xs px-2 transition-colors"
             >
               cancel
             </button>
           </div>
         )}
 
-        {/* Search + Sort bar — only shown when there are endpoints */}
+        {/* Search + Sort bar */}
         {endpoints.length > 0 && (
           <div className="flex items-center gap-3 mb-4">
             <input
@@ -207,21 +226,22 @@ export default function DashboardClient({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="search endpoints…"
-              className="flex-1 bg-gray-800 border border-gray-600 rounded px-3 py-1.5 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-green-500 transition-colors"
+              className="flex-1 bg-gray-800 border border-gray-600 rounded px-3 py-1.5 text-xs text-gray-200 placeholder-gray-400 focus:outline-none focus:border-green-500 transition-colors"
             />
             <div className="flex items-center gap-1 shrink-0">
-              <span className="text-gray-500 text-xs">sort:</span>
+              <span className="text-gray-400 text-xs">sort:</span>
               {(['date', 'name', 'requests'] as SortKey[]).map((key) => (
                 <button
                   key={key}
-                  onClick={() => setSortKey(key)}
+                  onClick={() => handleSort(key)}
                   className={`text-xs px-2 py-1 rounded transition-colors ${
                     sortKey === key
                       ? 'bg-gray-600 text-gray-100'
-                      : 'text-gray-500 hover:text-gray-300'
+                      : 'text-gray-400 hover:text-gray-200'
                   }`}
                 >
                   {key}
+                  {sortKey === key ? (sortDir === 'desc' ? ' ↓' : ' ↑') : ''}
                 </button>
               ))}
             </div>
@@ -230,12 +250,12 @@ export default function DashboardClient({
 
         {/* Endpoint list */}
         {endpoints.length === 0 ? (
-          <div className="text-center py-20 text-gray-500">
+          <div className="text-center py-20 text-gray-400">
             <div className="text-4xl mb-3">⌘</div>
             <div className="text-sm">no endpoints yet — create one to get started</div>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-12 text-gray-500 text-sm">
+          <div className="text-center py-12 text-gray-400 text-sm">
             no endpoints match &ldquo;{search}&rdquo;
           </div>
         ) : (
@@ -243,9 +263,9 @@ export default function DashboardClient({
             {filtered.map((ep) => (
               <div
                 key={ep.id}
-                className="group bg-gray-800 border border-gray-700 hover:border-gray-600 rounded-lg px-4 py-3 flex items-center gap-3 transition-colors"
+                className="group bg-gray-800 border border-gray-600 hover:border-gray-500 rounded-lg px-4 py-3 flex items-center gap-3 transition-colors"
               >
-                {/* Name + path */}
+                {/* Name + path + creator */}
                 <div className="flex-1 min-w-0">
                   <EndpointNameEditor
                     id={ep.id}
@@ -255,45 +275,70 @@ export default function DashboardClient({
                   />
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <div
-                      className="text-xs text-gray-500 font-mono truncate cursor-pointer hover:text-gray-300 transition-colors"
+                      className="text-xs text-gray-400 font-mono truncate cursor-pointer hover:text-gray-200 transition-colors"
                       onClick={() => router.push(`/e/${ep.id}`)}
                     >
                       /api/w/{ep.id}
                     </div>
                     <CopyUrlButton url={`${appUrl}/api/w/${ep.id}`} />
                   </div>
+                  <div className="text-[10px] text-gray-500 mt-0.5">
+                    created by {userEmail}
+                  </div>
                 </div>
 
                 {/* Request count */}
                 <div className="text-xs shrink-0 tabular-nums">
                   {ep.requestCount > 0 ? (
-                    <span className="text-gray-300">
+                    <span className="text-gray-200">
                       {ep.requestCount.toLocaleString()}
-                      <span className="text-gray-500 ml-1">req</span>
+                      <span className="text-gray-400 ml-1">req</span>
                     </span>
                   ) : (
-                    <span className="text-gray-600">—</span>
+                    <span className="text-gray-500">—</span>
                   )}
                 </div>
 
                 {/* Date */}
-                <div className="text-xs text-gray-500 shrink-0">
+                <div className="text-xs text-gray-400 shrink-0">
                   {new Date(ep.created_at).toLocaleDateString()}
                 </div>
 
+                {/* Inspect button */}
                 <button
                   onClick={() => router.push(`/e/${ep.id}`)}
-                  className="text-green-500 hover:text-green-400 text-xs opacity-0 group-hover:opacity-100 transition-all shrink-0"
+                  className="text-green-400 hover:text-green-300 text-xs opacity-0 group-hover:opacity-100 transition-all shrink-0"
                 >
                   inspect →
                 </button>
-                <button
-                  onClick={() => deleteEndpoint(ep.id)}
-                  disabled={deletingId === ep.id}
-                  className="text-red-500 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 transition-all shrink-0 disabled:opacity-50"
-                >
-                  {deletingId === ep.id ? '...' : 'delete'}
-                </button>
+
+                {/* Delete — with inline confirm */}
+                {deletingId === ep.id ? (
+                  <span className="text-gray-400 text-xs shrink-0">deleting…</span>
+                ) : confirmDeleteId === ep.id ? (
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="text-xs text-gray-300">sure?</span>
+                    <button
+                      onClick={() => deleteEndpoint(ep.id)}
+                      className="text-red-400 hover:text-red-300 text-xs transition-colors font-semibold"
+                    >
+                      yes
+                    </button>
+                    <button
+                      onClick={() => setConfirmDeleteId(null)}
+                      className="text-gray-400 hover:text-gray-200 text-xs transition-colors"
+                    >
+                      no
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setConfirmDeleteId(ep.id)}
+                    className="text-red-400 hover:text-red-300 text-xs opacity-0 group-hover:opacity-100 transition-all shrink-0"
+                  >
+                    delete
+                  </button>
+                )}
               </div>
             ))}
           </div>
@@ -302,7 +347,7 @@ export default function DashboardClient({
 
       {/* Footer */}
       <footer className="border-t border-gray-700 px-6 py-2 flex items-center justify-end shrink-0">
-        <span className="text-gray-600 text-xs">v0.2.0 · last updated Mar 6, 2026</span>
+        <span className="text-gray-500 text-xs">v0.2.0 · last updated Mar 6, 2026</span>
       </footer>
     </div>
   )
