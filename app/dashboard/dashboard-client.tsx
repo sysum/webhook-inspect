@@ -24,8 +24,40 @@ export default function DashboardClient({
   const [newName, setNewName] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [renamingId, setRenamingId] = useState<string | null>(null)
+  const [renameValue, setRenameValue] = useState('')
   const router = useRouter()
   const supabase = createClient()
+
+  function startRename(ep: Endpoint) {
+    setRenamingId(ep.id)
+    setRenameValue(ep.name ?? '')
+  }
+
+  function cancelRename() {
+    setRenamingId(null)
+    setRenameValue('')
+  }
+
+  async function commitRename(id: string) {
+    const trimmed = renameValue.trim()
+    const original = endpoints.find((e) => e.id === id)
+    // No-op if unchanged
+    if (trimmed === (original?.name ?? '')) {
+      cancelRename()
+      return
+    }
+    const res = await fetch(`/api/endpoints/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: trimmed }),
+    })
+    if (res.ok) {
+      const updated: Endpoint = await res.json()
+      setEndpoints((prev) => prev.map((e) => (e.id === id ? updated : e)))
+    }
+    cancelRename()
+  }
 
   async function createEndpoint() {
     setCreating(true)
@@ -139,16 +171,37 @@ export default function DashboardClient({
                 key={ep.id}
                 className="group bg-gray-900 border border-gray-800 hover:border-gray-700 rounded-lg px-4 py-3 flex items-center gap-3 transition-colors"
               >
-                <div
-                  className="flex-1 cursor-pointer min-w-0"
-                  onClick={() => router.push(`/e/${ep.id}`)}
-                >
-                  <div className="text-sm text-gray-100 truncate">
-                    {ep.name || (
-                      <span className="text-gray-500 italic">unnamed</span>
-                    )}
-                  </div>
-                  <div className="text-xs text-gray-600 font-mono mt-0.5 truncate">
+                {/* Name — click to rename, click path to navigate */}
+                <div className="flex-1 min-w-0">
+                  {renamingId === ep.id ? (
+                    <input
+                      autoFocus
+                      type="text"
+                      value={renameValue}
+                      onChange={(e) => setRenameValue(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') commitRename(ep.id)
+                        if (e.key === 'Escape') cancelRename()
+                      }}
+                      onBlur={() => commitRename(ep.id)}
+                      placeholder="endpoint label"
+                      className="w-full bg-gray-950 border border-green-700 rounded px-2 py-0.5 text-sm text-gray-100 placeholder-gray-600 focus:outline-none"
+                    />
+                  ) : (
+                    <div
+                      className="text-sm text-gray-100 truncate cursor-text"
+                      title="Click to rename"
+                      onClick={() => startRename(ep)}
+                    >
+                      {ep.name || (
+                        <span className="text-gray-600 italic">click to name</span>
+                      )}
+                    </div>
+                  )}
+                  <div
+                    className="text-xs text-gray-600 font-mono mt-0.5 truncate cursor-pointer hover:text-gray-400"
+                    onClick={() => router.push(`/e/${ep.id}`)}
+                  >
                     /api/w/{ep.id}
                   </div>
                 </div>
