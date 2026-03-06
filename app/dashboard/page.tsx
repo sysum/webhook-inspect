@@ -21,11 +21,14 @@ export default async function DashboardPage() {
     requestCount: (ep.requests as unknown as { count: number }[])?.[0]?.count ?? 0,
   }))
 
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
+
   return (
     <DashboardClient
       initialEndpoints={endpoints}
       userEmail={user.email ?? ''}
       isAdmin={isAdmin}
+      appUrl={appUrl}
     />
   )
 }
