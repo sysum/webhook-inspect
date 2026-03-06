@@ -8,8 +8,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "webhook.inspect",
+  title: "API Catcher",
   description: "Self-hosted webhook inspector — capture and debug HTTP requests in real time",
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+  },
 };
 
 export default function RootLayout({
