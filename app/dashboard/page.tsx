@@ -8,15 +8,22 @@ export default async function DashboardPage() {
   const { user, isAdmin } = await requireUser()
   const supabase = await createClient()
 
-  const { data: endpoints } = await supabase
+  const { data: rawEndpoints } = await supabase
     .from('endpoints')
-    .select('id, name, created_at')
+    .select('id, name, created_at, requests(count)')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 
+  const endpoints = (rawEndpoints ?? []).map((ep) => ({
+    id: ep.id as string,
+    name: ep.name as string | null,
+    created_at: ep.created_at as string,
+    requestCount: (ep.requests as unknown as { count: number }[])?.[0]?.count ?? 0,
+  }))
+
   return (
     <DashboardClient
-      initialEndpoints={endpoints ?? []}
+      initialEndpoints={endpoints}
       userEmail={user.email ?? ''}
       isAdmin={isAdmin}
     />
