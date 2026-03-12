@@ -7,7 +7,8 @@
       "Bash(npx tsc --noEmit)",
       "Bash(npm install typescript --save-dev)",
       "Bash(node node_modules/typescript/bin/tsc --noEmit)",
-      "Bash(npm run build)"
+      "Bash(npm run build)",
+      "Bash(npm i @vercel/speed-insights)"
     ]
   }
 }
