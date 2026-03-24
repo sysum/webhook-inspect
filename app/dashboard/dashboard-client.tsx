@@ -30,10 +30,10 @@ function CopyUrlButton({ url }: { url: string }) {
     <button
       onClick={copy}
       title="Copy webhook URL"
-      className="shrink-0 text-gray-400 hover:text-green-400 transition-colors"
+      className="shrink-0 text-gray-400 hover:text-orange-400 transition-colors"
     >
       {copied ? (
-        <span className="text-green-400 text-xs">✓</span>
+        <span className="text-orange-400 text-xs">✓</span>
       ) : (
         <svg
           width="12"
@@ -154,7 +154,7 @@ export default function DashboardClient({
     <div className="min-h-screen flex flex-col bg-gray-900 text-gray-100">
       {/* Header */}
       <header className="border-b border-gray-700 px-6 py-3 flex items-center justify-between shrink-0">
-        <span className="text-green-400 font-bold tracking-tight">webhook.inspect</span>
+        <span className="text-orange-400 font-bold tracking-tight">webhook.inspect</span>
         <div className="flex items-center gap-4">
           <span className="text-gray-300 text-xs">{userEmail}</span>
           {isAdmin && (
@@ -185,7 +185,7 @@ export default function DashboardClient({
           </div>
           <button
             onClick={() => setShowForm((v) => !v)}
-            className="bg-green-600 hover:bg-green-500 text-gray-950 text-xs font-bold py-1.5 px-4 rounded transition-colors"
+            className="bg-orange-600 hover:bg-orange-500 text-gray-950 text-xs font-bold py-1.5 px-4 rounded transition-colors"
           >
             + new endpoint
           </button>
@@ -201,12 +201,12 @@ export default function DashboardClient({
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && createEndpoint()}
               placeholder="endpoint label (optional)"
-              className="flex-1 bg-gray-700 border border-gray-500 rounded px-3 py-1.5 text-sm text-gray-100 placeholder-gray-400 focus:outline-none focus:border-green-500 transition-colors"
+              className="flex-1 bg-gray-700 border border-gray-500 rounded px-3 py-1.5 text-sm text-gray-100 placeholder-gray-400 focus:outline-none focus:border-orange-500 transition-colors"
             />
             <button
               onClick={createEndpoint}
               disabled={creating}
-              className="bg-green-600 hover:bg-green-500 disabled:opacity-50 text-gray-950 text-xs font-bold px-4 rounded transition-colors"
+              className="bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-gray-950 text-xs font-bold px-4 rounded transition-colors"
             >
               {creating ? '...' : 'create'}
             </button>
@@ -227,7 +227,7 @@ export default function DashboardClient({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="search endpoints…"
-              className="flex-1 bg-gray-800 border border-gray-600 rounded px-3 py-1.5 text-xs text-gray-200 placeholder-gray-400 focus:outline-none focus:border-green-500 transition-colors"
+              className="flex-1 bg-gray-800 border border-gray-600 rounded px-3 py-1.5 text-xs text-gray-200 placeholder-gray-400 focus:outline-none focus:border-orange-500 transition-colors"
             />
             <div className="flex items-center gap-1 shrink-0">
               <span className="text-gray-400 text-xs">sort:</span>

@@ -1,5 +1,5 @@
 const METHOD_COLORS: Record<string, string> = {
-  GET: 'text-green-400 bg-green-950 border-green-800',
+  GET: 'text-orange-400 bg-orange-950 border-orange-800',
   POST: 'text-blue-400 bg-blue-950 border-blue-800',
   PUT: 'text-yellow-400 bg-yellow-950 border-yellow-800',
   DELETE: 'text-red-400 bg-red-950 border-red-800',

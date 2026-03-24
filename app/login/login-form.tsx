@@ -40,7 +40,7 @@ export default function LoginForm({ urlError }: { urlError?: string }) {
       <div className="w-full max-w-sm">
         {/* Logo / Title */}
         <div className="mb-8 text-center">
-          <div className="text-2xl font-bold text-green-400 tracking-tight mb-1">
+          <div className="text-2xl font-bold text-orange-400 tracking-tight mb-1">
             webhook.inspect
           </div>
           <div className="text-gray-500 text-sm">
@@ -51,7 +51,7 @@ export default function LoginForm({ urlError }: { urlError?: string }) {
         <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
           {sent ? (
             <div className="text-center">
-              <div className="text-green-400 text-sm mb-2">✓ magic link sent</div>
+              <div className="text-orange-400 text-sm mb-2">✓ magic link sent</div>
               <div className="text-gray-400 text-xs">
                 check <span className="text-gray-200">{email}</span> for your sign-in link
               </div>
@@ -68,7 +68,7 @@ export default function LoginForm({ urlError }: { urlError?: string }) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full bg-gray-950 border border-gray-700 rounded px-3 py-2 text-sm text-gray-100 placeholder-gray-600 focus:outline-none focus:border-green-500 transition-colors"
+                  className="w-full bg-gray-950 border border-gray-700 rounded px-3 py-2 text-sm text-gray-100 placeholder-gray-600 focus:outline-none focus:border-orange-500 transition-colors"
                 />
               </div>
               {error && (
@@ -79,7 +79,7 @@ export default function LoginForm({ urlError }: { urlError?: string }) {
               <button
                 type="submit"
                 disabled={loading || !email}
-                className="w-full bg-green-600 hover:bg-green-500 disabled:bg-gray-700 disabled:text-gray-500 text-gray-950 text-sm font-semibold py-2 px-4 rounded transition-colors"
+                className="w-full bg-orange-600 hover:bg-orange-500 disabled:bg-gray-700 disabled:text-gray-500 text-gray-950 text-sm font-semibold py-2 px-4 rounded transition-colors"
               >
                 {loading ? 'sending...' : 'send magic link'}
               </button>

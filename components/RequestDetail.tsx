@@ -69,13 +69,13 @@ export default function RequestDetail({ request }: { request: Request | null }) 
             onClick={() => setTab(t)}
             className={`px-4 py-2 text-xs uppercase tracking-wider transition-colors ${
               tab === t
-                ? 'text-green-400 border-b border-green-400'
+                ? 'text-orange-400 border-b border-orange-400'
                 : 'text-gray-400 hover:text-gray-200'
             }`}
           >
             {t}
             {t === 'body' && hasBody && (
-              <span className="ml-1 text-[9px] text-green-500">●</span>
+              <span className="ml-1 text-[9px] text-orange-500">●</span>
             )}
             {t === 'query' && hasQuery && (
               <span className="ml-1 text-[9px] text-blue-400">●</span>

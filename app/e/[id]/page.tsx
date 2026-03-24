@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import { createClient } from '@/lib/supabase-server'
+import { createServiceClient } from '@/lib/supabase-service'
 import { requireUser } from '@/lib/auth'
 import { notFound } from 'next/navigation'
 import EndpointDetailHeader from './endpoint-detail-header'
@@ -25,13 +26,21 @@ export default async function EndpointPage({
 
   if (!endpoint) notFound()
 
-  // Fetch last 200 requests
-  const { data: requests } = await supabase
-    .from('requests')
-    .select('id, method, path, headers, query_params, body, ip, content_type, created_at')
-    .eq('endpoint_id', id)
-    .order('created_at', { ascending: false })
-    .limit(200)
+  const serviceClient = createServiceClient()
+
+  // Fetch initial requests + total count in parallel via service client (avoids RLS overhead)
+  const [{ data: requests }, { count: totalCount }] = await Promise.all([
+    serviceClient
+      .from('requests')
+      .select('id, method, path, headers, query_params, body, ip, content_type, created_at')
+      .eq('endpoint_id', id)
+      .order('created_at', { ascending: false })
+      .limit(200),
+    serviceClient
+      .from('requests')
+      .select('*', { count: 'exact', head: true })
+      .eq('endpoint_id', id),
+  ])
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
   const webhookUrl = `${appUrl}/api/w/${id}`
@@ -46,6 +55,7 @@ export default async function EndpointPage({
       <RequestList
         endpointId={id}
         initialRequests={requests ?? []}
+        totalCount={totalCount ?? 0}
       />
     </div>
   )

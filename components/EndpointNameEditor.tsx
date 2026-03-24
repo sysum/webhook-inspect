@@ -57,7 +57,7 @@ export default function EndpointNameEditor({
         // Prevent clicks inside the input from bubbling to any parent <Link>
         onClick={(e) => e.stopPropagation()}
         placeholder="endpoint label"
-        className={`bg-gray-950 border border-green-700 rounded px-2 py-0.5 text-sm text-gray-100 placeholder-gray-600 focus:outline-none ${block ? 'w-full' : 'min-w-[180px]'}`}
+        className={`bg-gray-950 border border-orange-700 rounded px-2 py-0.5 text-sm text-gray-100 placeholder-gray-600 focus:outline-none ${block ? 'w-full' : 'min-w-[180px]'}`}
       />
     )
   }

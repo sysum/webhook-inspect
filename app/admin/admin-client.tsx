@@ -111,7 +111,7 @@ function UserRow({
       {/* Status dot */}
       <div
         className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-          profile.blocked ? 'bg-red-400' : 'bg-green-400'
+          profile.blocked ? 'bg-red-400' : 'bg-orange-400'
         }`}
       />
 
@@ -147,7 +147,7 @@ function UserRow({
           disabled={loading}
           className={`text-xs px-3 py-1 rounded border transition-colors disabled:opacity-40 shrink-0 ${
             profile.blocked
-              ? 'text-green-300 border-green-600 hover:bg-green-900'
+              ? 'text-orange-300 border-orange-600 hover:bg-orange-900'
               : 'text-red-300 border-red-600 hover:bg-red-900'
           }`}
         >

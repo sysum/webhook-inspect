@@ -25,7 +25,7 @@ export default function EndpointDetailHeader({
       <EndpointNameEditor
         id={endpointId}
         initialName={initialName}
-        className="text-green-400 font-bold text-sm"
+        className="text-orange-400 font-bold text-sm"
       />
       <div className="flex-1" />
       {/* Webhook URL */}
