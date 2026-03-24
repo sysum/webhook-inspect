@@ -164,3 +164,25 @@ components/
 proxy.ts            Auth middleware (Next.js 16)
 supabase-schema.sql Run this once in Supabase SQL Editor
 ```
+
+---
+
+## Troubleshooting
+
+**Dashboard shows no endpoints despite data existing in the database**
+
+The `requests` table RLS policy uses a correlated subquery that runs for every row. Fetching request counts via an embedded `requests(count)` join triggers a statement timeout on large tables. The dashboard avoids this by fetching counts separately using the service role client (which bypasses RLS) after first fetching the endpoint list with the anon client (RLS-protected). If you see a timeout, check `app/dashboard/page.tsx`.
+
+**New users are being assigned the admin role**
+
+The app code in `lib/allowlist.ts` controls which emails receive admin — all others get `user`. If users are unexpectedly becoming admins, check your Supabase dashboard under **Database → Triggers** for any trigger on `auth.users` or `profiles` that hard-codes `role = 'admin'`. The auth callback uses `ignoreDuplicates: true`, so a trigger-created profile will not be overwritten.
+
+**Endpoints are visible in Supabase but not in the dashboard**
+
+This is usually a RLS policy issue. Confirm the `users_own_endpoints` policy exists on the `endpoints` table (**Database → Policies**). If it's missing, recreate it:
+
+```sql
+create policy "users_own_endpoints"
+  on endpoints for all
+  using (auth.uid() = user_id);
+```
