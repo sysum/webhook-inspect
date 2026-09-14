@@ -5,12 +5,15 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase-browser'
 import EndpointNameEditor from '@/components/EndpointNameEditor'
+import { formatCount } from '@/lib/request-counts'
 
 type Endpoint = {
   id: string
   name: string | null
   created_at: string
   requestCount: number
+  /** Counts for high-volume endpoints are planner estimates, shown as "~1,234". */
+  requestCountEstimated?: boolean
 }
 
 type SortKey = 'date' | 'name' | 'requests'
@@ -290,7 +293,7 @@ export default function DashboardClient({
                 <div className="text-xs shrink-0 tabular-nums">
                   {ep.requestCount > 0 ? (
                     <span className="text-gray-200">
-                      {ep.requestCount.toLocaleString()}
+                      {formatCount(ep.requestCount, ep.requestCountEstimated)}
                       <span className="text-gray-400 ml-1">req</span>
                     </span>
                   ) : (

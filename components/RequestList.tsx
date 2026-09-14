@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase-browser'
+import { formatCount } from '@/lib/request-counts'
 import MethodBadge from './MethodBadge'
 import RequestDetail from './RequestDetail'
 
@@ -43,10 +44,12 @@ export default function RequestList({
   endpointId,
   initialRequests,
   totalCount,
+  totalCountEstimated = false,
 }: {
   endpointId: string
   initialRequests: Request[]
   totalCount: number
+  totalCountEstimated?: boolean
 }) {
   // ── mode ────────────────────────────────────────────────────────────────
   const [mode, setMode] = useState<'live' | 'history'>('live')
@@ -62,7 +65,9 @@ export default function RequestList({
   const [historyPage, setHistoryPage] = useState(1)
   const [pageSize, setPageSize] = useState(100)
   const [filteredTotal, setFilteredTotal] = useState(0)
+  const [filteredEstimated, setFilteredEstimated] = useState(false)
   const [grandTotal, setGrandTotal] = useState(totalCount)
+  const [grandEstimated, setGrandEstimated] = useState(totalCountEstimated)
   const [loading, setLoading] = useState(false)
 
   // ── filters ──────────────────────────────────────────────────────────────
@@ -126,7 +131,9 @@ export default function RequestList({
         if (cancelled) return
         setHistoryRequests(json.data ?? [])
         setFilteredTotal(json.filteredTotal ?? 0)
+        setFilteredEstimated(json.filteredTotalEstimated ?? false)
         setGrandTotal(json.grandTotal ?? 0)
+        setGrandEstimated(json.grandTotalEstimated ?? false)
         setSelected(json.data?.[0] ?? null)
         listRef.current?.scrollTo({ top: 0 })
       })
@@ -182,15 +189,15 @@ export default function RequestList({
             {mode === 'live' ? (
               <>
                 <span>{liveRequests.length}</span>
-                <span className="text-gray-500"> / {grandTotal.toLocaleString()} total</span>
+                <span className="text-gray-500"> / {formatCount(grandTotal, grandEstimated)} total</span>
               </>
             ) : hasFilters ? (
               <>
-                <span>{filteredTotal.toLocaleString()} results</span>
-                <span className="text-gray-500"> of {grandTotal.toLocaleString()}</span>
+                <span>{formatCount(filteredTotal, filteredEstimated)} results</span>
+                <span className="text-gray-500"> of {formatCount(grandTotal, grandEstimated)}</span>
               </>
             ) : (
-              <span>{grandTotal.toLocaleString()} total</span>
+              <span>{formatCount(grandTotal, grandEstimated)} total</span>
             )}
           </div>
           <div className="flex items-center gap-2 shrink-0">
